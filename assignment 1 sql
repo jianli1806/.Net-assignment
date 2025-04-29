@@ -25,10 +25,11 @@ from Production.Product as p where p.Color IS NOT NULL;
 SELECT p.ProductID, p.Name
 from Production.Product as p where p.ProductID BETWEEN 400 and 500
 
-SELECT * from Production.Product as p WHERE p.Name LIKE 'S%'
 
 SELECT p.ProductID, p.Name, p.Color
 from Production.Product as p where p.Color in ('black', 'blue');
+
+SELECT * from Production.Product as p WHERE p.Name LIKE 'S%'
 
 SELECT p.Name, p.ListPrice
 from Production.Product as p order by p.Name DESC
@@ -38,7 +39,7 @@ from Production.Product as p WHERE p.Name LIKE 'A%' OR p.Name LIKE 'S%'
 ORDER BY p.Name;
 
 SELECT p.Name, p.ListPrice
-from Production.Product as p WHERE p.Name LIKE 'A[^SPO]%' or p.Name LIKE 'S[^SPO]%'
+from Production.Product as p WHERE p.Name LIKE 'SPO[^K]%' or p.Name LIKE 'S[^SPO]%'
 ORDER BY p.Name
 
 SELECT distinct p.Color
