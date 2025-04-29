@@ -25,6 +25,8 @@ from Production.Product as p where p.Color IS NOT NULL;
 SELECT p.ProductID, p.Name
 from Production.Product as p where p.ProductID BETWEEN 400 and 500
 
+SELECT * from Production.Product as p WHERE p.Name LIKE 'S%'
+
 SELECT p.ProductID, p.Name, p.Color
 from Production.Product as p where p.Color in ('black', 'blue');
 
