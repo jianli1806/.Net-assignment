@@ -1,0 +1,143 @@
+USE AdventureWorks2019
+
+SELECT COUNT(ProductID) AS TotalNumOfRows
+FROM Production.Product
+
+SELECT COUNT(ProductID) AS TotalNumOfRows
+FROM Production.Product where ProductSubcategoryID is not NULL
+
+SELECT p.ProductSubcategoryID, COUNT(p.ProductSubcategoryID) as CountedProducts
+FROM Production.Product p where ProductSubcategoryID is not NULL 
+GROUP BY p.ProductSubcategoryID
+
+
+SELECT COUNT(p.ProductID)
+FROM Production.Product p where ProductSubcategoryID is NULL 
+
+SELECT SUM(p.Quantity)
+FROM Production.ProductInventory p 
+
+SELECT p.ProductID,  SUM(p.Quantity) AS TheSum
+FROM Production.ProductInventory p WHERE p.LocationID = 40 
+GROUP BY p.ProductID having SUM(p.Quantity) < 100
+
+SELECT p.Shelf, p.ProductID,  SUM(p.Quantity) AS TheSum
+FROM Production.ProductInventory p WHERE p.LocationID = 40 
+GROUP BY p.Shelf, p.ProductID having SUM(p.Quantity) < 100
+
+SELECT AVG(p.Quantity)
+FROM Production.ProductInventory p WHERE p.LocationID = 10 
+
+SELECT  p.ProductID, p.Shelf, AVG(p.Quantity) AS TheAvg
+FROM Production.ProductInventory p GROUP BY p.ProductID, p.Shelf
+
+SELECT  p.ProductID, p.Shelf, AVG(p.Quantity) AS TheAvg
+FROM Production.ProductInventory p WHERE p.Shelf <> 'N/A' GROUP BY p.ProductID, p.Shelf
+
+SELECT Color,  NULL AS Class,  COUNT(*) AS TheCount, AVG(ListPrice) AS AvgPrice
+FROM Production.Product
+WHERE  Color IS NOT NULL GROUP BY  Color
+
+UNION ALL
+
+SELECT NULL AS Color,  Class, COUNT(*) AS TheCount,  AVG(ListPrice) AS AvgPrice
+FROM  Production.Product WHERE  Class IS NOT NULL
+GROUP BY  Class;
+
+SELECT c.Name AS Country, s.Name AS Province
+FROM Person.CountryRegion c inner join Person.StateProvince s on c.CountryRegioncode = s.CountryRegionCode
+
+SELECT c.Name AS Country, s.Name AS Province
+FROM Person.CountryRegion c inner join Person.StateProvince s on c.CountryRegioncode = s.CountryRegionCode
+WHERE c.Name IN ('Canada','Germany')
+
+use Northwind
+go
+
+SELECT DISTINCT p.*
+FROM Products p
+INNER JOIN [Order Details] od ON p.ProductID = od.ProductID
+INNER JOIN Orders o ON od.OrderID = o.OrderID
+WHERE o.OrderDate >= DATEADD(YEAR, -27, GETDATE())
+
+SELECT TOP 5 O.ShipPostalCode
+FROM Products p
+INNER JOIN [Order Details] od ON p.ProductID = od.ProductID
+INNER JOIN Orders o ON od.OrderID = o.OrderID
+ORDER BY od.Quantity DESC
+
+SELECT TOP 5 O.ShipPostalCode
+FROM Products p
+INNER JOIN [Order Details] od ON p.ProductID = od.ProductID
+INNER JOIN Orders o ON od.OrderID = o.OrderID
+WHERE o.OrderDate >= DATEADD(YEAR, -27, GETDATE())
+ORDER BY od.Quantity DESC
+ 
+SELECT c.City, COUNT(c.CustomerID)
+FROM Customers c GROUP BY c.City
+
+SELECT c.City, COUNT(c.CustomerID)
+FROM Customers c GROUP BY c.City
+HAVING COUNT(c.CustomerID) > 2
+
+SELECT c.ContactName, o.OrderDate
+FROM Customers c JOIN Orders o ON c.CustomerID = o.CustomerID
+WHERE o.OrderDate > '1998-01-01'
+
+SELECT c.ContactName, MAX(O.OrderDate)
+FROM Customers c JOIN Orders o ON c.CustomerID = o.CustomerID
+GROUP BY c.ContactName
+
+SELECT c.ContactName, COUNT(od.ProductID)
+FROM Customers c LEFT JOIN Orders o ON c.CustomerID = o.CustomerID
+LEFT JOIN [Order Details] od ON o.OrderID = od.OrderID
+GROUP BY c.ContactName
+
+SELECT c.CustomerID, COUNT(od.ProductID)
+FROM Customers c LEFT JOIN Orders o ON c.CustomerID = o.CustomerID
+LEFT JOIN [Order Details] od ON o.OrderID = od.OrderID
+GROUP BY c.CustomerID HAVING COUNT(od.ProductID) > 100
+
+SELECT s.CompanyName as [Supplier Company Name], sh.CompanyName as [Shipping Company Name]
+FROM Suppliers s CROSS JOIN Shippers sh
+
+SELECT o.OrderDate, p.ProductName
+FROM Orders o JOIN [Order Details] od ON o.OrderID = od.OrderID
+JOIN Products p ON od.ProductID = p.ProductID
+ORDER BY o.OrderDate, p.ProductName
+
+SELECT e1.FirstName + ' ' + e1.LastName AS Employee1,
+e2.FirstName + ' ' + e2.LastName AS Employee2
+ FROM Employees e1 join Employees e2 
+ON e1.Title = e2.Title AND e1.EmployeeID < e2.EmployeeID
+
+SELECT 
+    m.EmployeeID,
+    m.FirstName,
+    m.LastName,
+    COUNT(e.EmployeeID) AS NumberOfReports
+FROM Employees m INNER JOIN 
+Employees e ON m.EmployeeID = e.ReportsTo
+GROUP BY m.EmployeeID, m.FirstName, m.LastName
+HAVING COUNT(e.EmployeeID) > 2;
+
+SELECT 
+    City,
+    CompanyName AS Name,
+    ContactName,
+    'Customer' AS Type
+FROM 
+    Customers
+
+UNION ALL
+
+SELECT 
+    City,
+    CompanyName AS Name,
+    ContactName,
+    'Supplier' AS Type
+FROM 
+    Suppliers
+
+ORDER BY 
+    City, Type, Name;
