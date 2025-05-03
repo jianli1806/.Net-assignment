@@ -1,0 +1,97 @@
+SELECT DISTINCT c.City
+FROM Customers c JOIN Employees e ON c.City = e.City
+
+SELECT DISTINCT City
+FROM Customers
+WHERE City NOT IN (SELECT City FROM Employees);
+
+SELECT DISTINCT c.City
+FROM Customers c
+LEFT JOIN Employees e ON c.City = e.City
+WHERE e.City IS NULL;
+
+SELECT 
+    p.ProductID,
+    p.ProductName,
+    SUM(od.Quantity) AS TotalQuantity
+FROM 
+    Products p
+LEFT JOIN 
+    [Order Details] od ON p.ProductID = od.ProductID
+GROUP BY 
+    p.ProductID, p.ProductName;
+
+SELECT c.City,SUM(od.Quantity) AS TotalProductsOrdered
+FROM Customers c
+JOIN  Orders o ON c.CustomerID = o.CustomerID
+JOIN [Order Details] od ON o.OrderID = od.OrderID
+GROUP BY  c.City;
+
+SELECT City FROM Customers
+GROUP BY  City
+HAVING  COUNT(CustomerID) >= 2;
+
+SELECT c.City FROM  Customers c
+JOIN Orders o ON c.CustomerID = o.CustomerID
+JOIN [Order Details] od ON o.OrderID = od.OrderID
+GROUP BY  c.City HAVING COUNT(DISTINCT od.ProductID) >= 2;
+
+SELECT DISTINCT c.*
+FROM  Customers c
+JOIN Orders o ON c.CustomerID = o.CustomerID
+WHERE  o.ShipCity <> c.City;
+
+
+SELECT TOP 5 od.ProductID, pr.ProductName, AVG(od.UnitPrice) AS AvgPrice, 
+    (SELECT TOP 1 c.City 
+        FROM [Order Details] od2 
+        JOIN Orders o2 ON od2.OrderID = o2.OrderID 
+        JOIN Customers c ON o2.CustomerID = c.CustomerID 
+        WHERE od2.ProductID = od.ProductID 
+        GROUP BY c.City 
+        ORDER BY SUM(od2.Quantity) DESC
+    ) AS TopCity, 
+    SUM(od.Quantity) AS TotalOrdered
+FROM [Order Details] od
+JOIN Products pr ON od.ProductID = pr.ProductID
+GROUP BY od.ProductID, pr.ProductName
+ORDER BY TotalOrdered DESC
+
+SELECT DISTINCT e.City
+FROM Employees e
+WHERE e.City NOT IN (
+    SELECT DISTINCT c.City
+    FROM Orders o
+    JOIN Customers c ON o.CustomerID = c.CustomerID
+)
+
+
+SELECT DISTINCT e.City
+FROM Employees e
+LEFT JOIN Customers c ON e.City = c.City
+LEFT JOIN Orders o ON c.CustomerID = o.CustomerID
+WHERE o.OrderID IS NULL
+
+SELECT ec.EmployeeCity
+FROM (
+    SELECT TOP 1 e.City AS EmployeeCity, COUNT(od.Quantity) AS OrderCount
+    FROM [Order Details] od
+    JOIN Orders o ON od.OrderID = o.OrderID
+    JOIN Employees e ON o.EmployeeID = e.EmployeeID
+    GROUP BY e.City
+    ORDER BY OrderCount DESC
+) ec
+JOIN (
+    SELECT TOP 1 c.City AS CustomerCity, SUM(od.Quantity) AS TotalQty
+    FROM [Order Details] od
+    JOIN Orders o ON od.OrderID = o.OrderID
+    JOIN Customers c ON o.CustomerID = c.CustomerID
+    GROUP BY c.City
+    ORDER BY TotalQty DESC
+) cc ON ec.EmployeeCity = cc.CustomerCity
+
+-- Using a Temporary Table (for all columns)
+
+SELECT DISTINCT *
+INTO Orders_temp
+FROM Orders
